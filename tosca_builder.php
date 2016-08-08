@@ -91,8 +91,8 @@ class tosca_builder {
 							default:   constant
 							status:   string
 							constraints:   operator
-
-	methods:
+*/
+/*	methods:
 	<entity_name>_add() --> create the entity
 							parameters:
 								$name: (string) name of the entity (only for entity in list)
@@ -104,7 +104,7 @@ class tosca_builder {
 							parameters:
 								$name: (string) name of the entity (only for entity in list)
 								$attr: (string) attribute name
-								$value: (depending on attribute type) attibute value
+								$value: (depending on attribute type, see structure above) attibute value
 							returns:
 								tosca_builder object
 	<entity_name>_del() --> delete an attribute or the entire entity 
@@ -320,8 +320,8 @@ class tosca_builder {
 			 (($tt = $this->_template->get_topology_template()) !== null) &&
 			 (($nt = $tt->get_node_templates($this->_current_node_name)) !== null) &&
 			 (($if = $nt->get_interfaces($name)) !== null) ) {  // TBD error handling
-				$this->_current_node_if_name = $name;
-			}
+			$this->_current_node_if_name = $name;
+		}
 		return $this;
 	}
 	public function node_template_interface_get($name) {
@@ -329,9 +329,9 @@ class tosca_builder {
 			 (($tt = $this->_template->get_topology_template()) !== null) &&
 			 (($nt = $tt->get_node_templates($this->_current_node_name)) !== null) &&
 			 (($if = $nt->get_interfaces($name)) !== null) ) {  // TBD error handling
-				$this->_current_node_if_name = $name;
-				return $if->get();
-			}
+			$this->_current_node_if_name = $name;
+			return $if->get();
+		}
 	}
 
 	public function node_template_if_operation_add($name, $en_val = null) {
@@ -374,12 +374,45 @@ class tosca_builder {
 		return $this;
 	}
 	public function node_template_if_operation_del($name, $attr = null, $todel = null) {
+		if ( is_a($this->_template, 'tosca_service_template') &&
+			 (($tt = $this->_template->get_topology_template()) !== null) &&
+			 (($nt = $tt->get_node_templates($this->_current_node_name)) !== null) &&
+			 (($if = $nt->get_interfaces($this->_current_node_if_name)) !== null) && 
+			 (($op = $if->get_operations($name)) !== null) ) {  // TBD error handling
+			 if (!isset($attr)) {
+				$if->delete('operations', [$name]);
+				$this->_current_node_if_operation_name = null;
+			 }
+			 else {
+				$op->delete($attr, $todel);
+				$if->operations([$name => $op->get()]);
+				$this->_current_node_if_operation_name = $name;
+			}
+			$nt->interfaces([$this->_current_node_if_name => $if->get()]);
+			$tt->node_templates([$this->_current_node_name => $nt->get()]);
+			$this->_template->topology_template($tt->get());
+		}
 		return $this;
 	}
 	public function node_template_if_operation_set($name) {
+		if ( is_a($this->_template, 'tosca_service_template') &&
+			 (($tt = $this->_template->get_topology_template()) !== null) &&
+			 (($nt = $tt->get_node_templates($this->_current_node_name)) !== null) &&
+			 (($if = $nt->get_interfaces($this->_current_node_if_name)) !== null) && 
+			 (($op = $if->get_operations($name)) !== null) ) {  // TBD error handling
+			$this->_current_node_if_operation_name = $name;
+		}
 		return $this;
 	}
 	public function node_template_if_operation_get($name) {
+		if ( is_a($this->_template, 'tosca_service_template') &&
+			 (($tt = $this->_template->get_topology_template()) !== null) &&
+			 (($nt = $tt->get_node_templates($this->_current_node_name)) !== null) &&
+			 (($if = $nt->get_interfaces($this->_current_node_if_name)) !== null) && 
+			 (($op = $if->get_operations($name)) !== null) ) {  // TBD error handling
+			$this->_current_node_if_operation_name = $name;
+			return $op->get();
+		}
 	}
 
 /*

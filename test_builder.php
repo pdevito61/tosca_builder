@@ -20,7 +20,10 @@ $st->topology_template_mod('description', 'topology template di prova con aggiun
 	->node_template_set('NODE01')
 	->node_template_interface_add('Standard', 'tosca.interfaces.node.lifecycle.Standard')
 	->node_template_interface_mod('Standard', 'inputs', array('input1' => '45', 'input2' => '65'))
-	->node_template_if_operation_add('create');
+	->node_template_if_operation_add('create')
+	->node_template_if_operation_mod('create', 'description', 'example of create operation')
+	->node_template_if_operation_mod('create', 'inputs', ['create input 1' => 66, 'create input 2' => 78])
+	->node_template_if_operation_mod('create', 'implementation', 'implementation.sh', ['setup.sh','library.rpm']);
 	
 echo $st->yaml();
 // print_r($st->topology_template_get());
